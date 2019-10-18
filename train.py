@@ -52,11 +52,11 @@ def train_gmm(opt, train_loader, model, board):
     optimizer = torch.optim.Adam(model.parameters(), lr=opt.lr, betas=(0.5, 0.999))
     scheduler = torch.optim.lr_scheduler.LambdaLR(optimizer, lr_lambda = lambda step: 1.0 -
             max(0, step - opt.keep_step) / float(opt.decay_step + 1))
-    epoch = 1
+    
     for step in range(opt.keep_step + opt.decay_step):
         iter_start_time = time.time()
         inputs = train_loader.next_batch()
-        data_iter = tqdm(enumerate(train_loader), desc='epoch: %d' % (epoch), total=len(train_loader), bar_format='{l_bar}{r_bar}')   
+
         im = inputs['image'].cuda()
         im_pose = inputs['pose_image'].cuda()
         im_h = inputs['head'].cuda()
@@ -66,7 +66,6 @@ def train_gmm(opt, train_loader, model, board):
         cm = inputs['cloth_mask'].cuda()
         im_c =  inputs['parse_cloth'].cuda()
         im_g = inputs['grid_image'].cuda()
-        epoch = epoch + 1
         
         grid, theta = model(agnostic, c)
         warped_cloth = F.grid_sample(c, grid, padding_mode='border')
@@ -105,16 +104,15 @@ def train_tom(opt, train_loader, model, board):
     optimizer = torch.optim.Adam(model.parameters(), lr=opt.lr, betas=(0.5, 0.999))
     scheduler = torch.optim.lr_scheduler.LambdaLR(optimizer, lr_lambda = lambda step: 1.0 -
             max(0, step - opt.keep_step) / float(opt.decay_step + 1))
-    epoch = 1
+    
     for step in range(opt.keep_step + opt.decay_step):
         iter_start_time = time.time()
         inputs = train_loader.next_batch()
-        data_iter = tqdm(enumerate(train_loader), desc='epoch: %d' % (epoch), total=len(train_loader), bar_format='{l_bar}{r_bar}')
         im = inputs['image'].cuda()
         im_pose = inputs['pose_image']
         im_h = inputs['head']
         shape = inputs['shape']
-        epoch = epoch + 1
+        
         
         agnostic = inputs['agnostic'].cuda()
         c = inputs['cloth'].cuda()
